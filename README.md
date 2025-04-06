@@ -2,16 +2,18 @@
 [![HTML5](https://img.shields.io/badge/-HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/zh-CN/docs/Web/HTML)
 [![CSS3](https://img.shields.io/badge/-CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/zh-CN/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript)
-[![libgif.js](https://img.shields.io/badge/-libgif.js-1.0.2-009688?logo=javascript)](https://github.com/buzzfeed/libgif-js)
+[![libgif.js](https://img.shields.io/badge/libgif-1.0.2-CD3919)](https://github.com/buzzfeed/libgif-js)
 
 # GIF to Frames Converter
 
 ![工具截图](./assets/preview.png)
 
 一款GIF处理工具，支持帧分解、可视化查看与雪碧图生成，采用清新像素风格设计。
-（原本是为了方便临摹Gif像素画，后来发现 Aseprite 可以直接拖Gif进去😭）
 
-## 功能特性
+
+*（原本是为了方便临摹Gif像素画，后来发现 Aseprite 可以直接拖Gif进去😭）*
+
+## ✨ 功能特性
 
 | 功能                | 描述                          |
 |---------------------|-------------------------------|
@@ -52,16 +54,16 @@
 
 下载压缩包后，双击html文件直接打开
 
-## 技术细节
+## 🔧 技术细节
 
 - 使用`libgif.js`库解析GIF文件
 - 纯前端实现，无需服务器处理
 - 采用现代CSS特性实现像素风格设计
 - 响应式布局适配各种屏幕尺寸
 
-## 开发与贡献
+## 🤝 开发与贡献
 
 欢迎提交issue或pull request！
 
-## 许可证
-MIT
+## 📜 许可证
+[MIT](https://github.com/puzdjX/Gif-To-Frames-Converter/blob/main/LICENSE)
