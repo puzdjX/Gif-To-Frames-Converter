@@ -214,62 +214,70 @@ function loadGIF(gifUrl) {
 }
 
 function loadFramesSync(gif, frameCount) {
-    if (!isProcessing) return; // 如果处理已取消则停止
+    if (!isProcessing) return;
 
-    for (let i = 0; i < frameCount; i++) {
-        gif.move_to(i); // 移动到特定帧
-        const canvas = gif.get_canvas(); // 获取当前帧的画布
+    // 添加进度条动画函数
+    function updateProgressBar(progress) {
+        const progressBarFill = document.getElementById("progressBarFill");
+        progressBarFill.style.width = `${progress}%`;
+        // 强制浏览器重绘
+        progressBarFill.style.display = 'none';
+        progressBarFill.offsetHeight; // 触发重排
+        progressBarFill.style.display = 'block';
+    }
 
-        // 创建新画布确保获取完整帧
+    // 使用requestAnimationFrame优化进度更新
+    function processFrame(i) {
+        if (!isProcessing || i >= frameCount) {
+            loadingOverlay.style.display = "none";
+            isProcessing = false;
+            return;
+        }
+
+        gif.move_to(i);
+        const canvas = gif.get_canvas();
         const fullFrameCanvas = document.createElement("canvas");
         fullFrameCanvas.width = canvas.width;
         fullFrameCanvas.height = canvas.height;
         const ctx = fullFrameCanvas.getContext("2d");
-
-        // 将当前帧绘制到新画布上
         ctx.drawImage(canvas, 0, 0);
 
-        // 将新画布转换为图片URL
         const frameUrl = fullFrameCanvas.toDataURL("image/png");
-        frameUrls[i] = frameUrl; // 在正确索引处存储帧URL
+        frameUrls[i] = frameUrl;
 
-        // 为每帧创建容器
         const frameItem = document.createElement("div");
         frameItem.className = "frame-item";
 
-        // 为帧创建图片元素
         const frameImg = document.createElement("img");
         frameImg.src = frameUrl;
-        frameImg.alt = `帧 ${i + 1}`;
+        frameImg.alt = `Frame ${i + 1}`;
 
-        // 添加帧信息(如帧号)
         const frameInfo = document.createElement("div");
         frameInfo.className = "frame-info";
-        frameInfo.textContent = `Frame ${i + 1}`;
+        frameInfo.textContent = `FRAME ${i + 1}`;
 
-        // 将图片和信息追加到容器
         frameItem.appendChild(frameImg);
         frameItem.appendChild(frameInfo);
 
-        // 添加点击事件显示放大图片
         frameItem.addEventListener("click", () => {
-            currentFrameIndex = i; // 设置当前帧索引
-            showModal(frameUrl); // 显示带有点击帧的模态框
+            currentFrameIndex = i;
+            showModal(frameUrl);
         });
 
-        // 将容器追加到帧容器
         framesContainer.appendChild(frameItem);
 
-        // 更新进度条
-        const progressBarFill = document.getElementById("progressBarFill");
+        // 更新进度
         const progress = ((i + 1) / frameCount) * 100;
-        progressBarFill.style.width = `${progress}%`;
+        updateProgressBar(progress);
+
+        // 使用setTimeout分批处理，避免阻塞UI
+        setTimeout(() => {
+            processFrame(i + 1);
+        }, 0);
     }
 
-    // 所有帧处理完成后隐藏加载遮罩
-    const loadingOverlay = document.getElementById("loadingOverlay");
-    loadingOverlay.style.display = "none";
-    isProcessing = false;
+    // 开始处理
+    processFrame(0);
 }
 
 // 显示带有所选帧的模态框
