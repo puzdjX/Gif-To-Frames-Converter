@@ -109,31 +109,50 @@ modal.addEventListener("wheel", (event) => {
 
 // 处理鼠标移动用于像素颜色检测
 modal.addEventListener("mousemove", (event) => {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-
     if (isCtrlPressed && modalImage) {
+        const transform = window.getComputedStyle(modalImage).transform;
+        const matrix = transform.match(/matrix\((.+)\)/);
+
+        // 解析缩放矩阵
+        let scaleX = 1, scaleY = 1;
+        if (matrix) {
+            const values = matrix[1].split(', ').map(Number);
+            scaleX = Math.sqrt(values[0] ** 2 + values[1] ** 2);
+            scaleY = Math.sqrt(values[2] ** 2 + values[3] ** 2);
+        }
+
+        // 获取精确位置
         const rect = modalImage.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / scale; // 考虑缩放比例
-        const y = (event.clientY - rect.top) / scale; // 考虑缩放比例
+        const scrollX = window.scrollX || document.documentElement.scrollLeft;
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
 
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = modalImage.naturalWidth; // 使用图片的原始宽度
-        canvas.height = modalImage.naturalHeight; // 使用图片的原始高度
-        ctx.drawImage(modalImage, 0, 0, canvas.width, canvas.height);
+        // 计算实际像素坐标
+        const x = Math.floor(
+            ((event.clientX - rect.left + scrollX - (rect.width - modalImage.naturalWidth * scaleX) / 2) / scaleX
+            ));
 
-        const pixel = ctx.getImageData(x, y, 1, 1).data;
-        const color = `RGB: ${pixel[0]}, ${pixel[1]}, ${pixel[2]}`;
-        document.getElementById("colorValue").textContent = color;
-        document.getElementById(
-            "colorPreview"
-        ).style.backgroundColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+        const y = Math.floor(
+            ((event.clientY - rect.top + scrollY - (rect.height - modalImage.naturalHeight * scaleY) / 2) / scaleY
+            ));
 
-        // 定位像素颜色显示框
+        // 边界检查
+        if (x >= 0 && y >= 0 && x < modalImage.naturalWidth && y < modalImage.naturalHeight) {
+            const canvas = document.createElement("canvas");
+            canvas.width = modalImage.naturalWidth;
+            canvas.height = modalImage.naturalHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(modalImage, 0, 0);
+
+            const pixel = ctx.getImageData(x, y, 1, 1).data;
+            document.getElementById("colorValue").textContent = `RGB: ${pixel[0]}, ${pixel[1]}, ${pixel[2]}`;
+            document.getElementById("colorPreview").style.backgroundColor =
+                `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+        }
+
+        // 更新显示位置
         const pixelColorDiv = document.getElementById("pixelColor");
-        pixelColorDiv.style.left = `${mouseX + 10}px`;
-        pixelColorDiv.style.top = `${mouseY + 10}px`;
+        pixelColorDiv.style.left = `${event.clientX + 15}px`;
+        pixelColorDiv.style.top = `${event.clientY + 15}px`;
     }
 });
 
