@@ -11,6 +11,19 @@ let isCtrlPressed = false; // 是否按下Ctrl键
 let mouseX = 0,
     mouseY = 0; // 鼠标位置
 
+// 页面加载时检查保存的主题偏好
+document.addEventListener("DOMContentLoaded", function () {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        document.getElementById("moonIcon").style.display = "none";
+        document.getElementById("sunIcon").style.display = "block";
+        document
+            .getElementById("themeToggle")
+            .setAttribute("title", "切换亮色模式");
+    }
+});
+
 // 主题切换
 const themeToggle = document.getElementById("themeToggle");
 const moonIcon = document.getElementById("moonIcon");
@@ -23,10 +36,12 @@ themeToggle.addEventListener("click", () => {
         moonIcon.style.display = "none";
         sunIcon.style.display = "block";
         themeToggle.setAttribute("title", "切换亮色模式");
+        localStorage.setItem("theme", "dark");
     } else {
         moonIcon.style.display = "block";
         sunIcon.style.display = "none";
         themeToggle.setAttribute("title", "切换暗黑模式");
+        localStorage.setItem("theme", "light");
     }
 });
 
